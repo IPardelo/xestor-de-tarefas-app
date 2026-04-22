@@ -10,6 +10,7 @@ import Sidebar from '@/Components/Layout/Sidebar';
 import TaskFilter from '@/Components/Tasks/TaskFilter';
 import CalendarView from '@/Components/Calendar/CalendarView';
 import CalendarErrorBoundary from '@/Components/Calendar/CalendarErrorBoundary';
+import NotesView from '@/Components/Notes/NotesView';
 import OptionsUsersView from '@/Components/Options/OptionsUsersView';
 import OptionsGlobalView from '@/Components/Options/OptionsGlobalView';
 import ProjectsView from '@/Components/Projects/ProjectsView';
@@ -133,6 +134,7 @@ export default function App() {
 			);
 		}
 
+		if (vistaActual === 'notas') return <NotesView />;
 		if (vistaActual === 'calendario') {
 			return (
 				<CalendarErrorBoundary key='calendar-boundary'>

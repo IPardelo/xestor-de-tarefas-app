@@ -41,6 +41,13 @@ const BarraLateral = ({
 	const opcionesNavegacion = [
 		{ id: 'inicio', icon: 'fa-house', label: t.home, activo: vistaActual === 'inicio', proximamente: false },
 		{
+			id: 'notas',
+			icon: 'fa-note-sticky',
+			label: t.notes,
+			activo: vistaActual === 'notas',
+			proximamente: false,
+		},
+		{
 			id: 'calendario',
 			icon: 'fa-calendar-days',
 			label: t.calendar,
