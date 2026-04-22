@@ -16,6 +16,9 @@ export default function UserSettingsView() {
 		idiomaPredeterminado: 'gl',
 		xenero: 'F',
 		contrasenha: '',
+		calendarioIcal1: '',
+		calendarioIcal2: '',
+		calendarioIcal3: '',
 	});
 
 	useEffect(() => {
@@ -25,6 +28,9 @@ export default function UserSettingsView() {
 			idiomaPredeterminado: usuarioActual.idiomaPredeterminado || 'gl',
 			xenero: usuarioActual.xenero || 'F',
 			contrasenha: usuarioActual.contrasenha || '',
+			calendarioIcal1: usuarioActual.calendariosIcal?.[0] || '',
+			calendarioIcal2: usuarioActual.calendariosIcal?.[1] || '',
+			calendarioIcal3: usuarioActual.calendariosIcal?.[2] || '',
 		});
 	}, [usuarioActual]);
 
@@ -35,11 +41,17 @@ export default function UserSettingsView() {
 
 	const onSubmit = (e) => {
 		e.preventDefault();
+		const calendariosIcal = [form.calendarioIcal1, form.calendarioIcal2, form.calendarioIcal3]
+			.map((url) => url.trim())
+			.filter(Boolean)
+			.slice(0, 3);
+
 		const payload = {
 			imaxePerfil: form.imaxePerfil,
 			idiomaPredeterminado: form.idiomaPredeterminado,
 			xenero: form.xenero,
 			contrasenha: form.contrasenha,
+			calendariosIcal,
 		};
 		dispatch(actualizarPreferenciasUsuarioActual(payload));
 		showToast(t.toastUserSettingsSaved);
@@ -98,6 +110,36 @@ export default function UserSettingsView() {
 							className='w-full px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white'
 						/>
 					</div>
+				</div>
+				<div className='grid grid-cols-1 gap-3'>
+					<label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>
+						{t.googleCalendarIcalTitle}
+					</label>
+					<p className='text-xs text-gray-500 dark:text-gray-400 -mt-2'>{t.googleCalendarIcalHelp}</p>
+					<input
+						type='url'
+						name='calendarioIcal1'
+						value={form.calendarioIcal1}
+						onChange={onChange}
+						placeholder='https://calendar.google.com/calendar/ical/.../basic.ics'
+						className='w-full px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white'
+					/>
+					<input
+						type='url'
+						name='calendarioIcal2'
+						value={form.calendarioIcal2}
+						onChange={onChange}
+						placeholder='https://calendar.google.com/calendar/ical/.../basic.ics'
+						className='w-full px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white'
+					/>
+					<input
+						type='url'
+						name='calendarioIcal3'
+						value={form.calendarioIcal3}
+						onChange={onChange}
+						placeholder='https://calendar.google.com/calendar/ical/.../basic.ics'
+						className='w-full px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-white'
+					/>
 				</div>
 				<div className='pt-2'>
 					<div className='flex justify-end'>

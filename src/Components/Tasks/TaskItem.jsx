@@ -51,6 +51,8 @@ const ElementoTarea = ({ tarea }) => {
 	};
 
 	const prioridad = prioridades[tarea.prioridad] || prioridades.media;
+	const tipoTarea = tarea.tipo === 'reunion' ? 'reunion' : 'tarea';
+	const etiquetaTipo = tipoTarea === 'reunion' ? t.taskTypeMeeting : t.taskTypeTask;
 	const asignadaA = usuarios.find((u) => u.id === tarea.asignadaAId);
 	const colaborador = (tarea.compartidaConIds || [])
 		.map((id) => usuarios.find((u) => u.id === id))
@@ -291,6 +293,13 @@ const ElementoTarea = ({ tarea }) => {
 						</p>
 					)}
 					<div className='flex flex-wrap items-center gap-2 text-sm'>
+						<span className='inline-flex items-center text-xs px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300'>
+							<i
+								className={`fa-solid ${
+									tipoTarea === 'reunion' ? 'fa-people-group' : 'fa-list-check'
+								} mr-1`}></i>
+							{t.taskType}: {etiquetaTipo}
+						</span>
 						{tarea.fechaVencimiento && (
 							<span className='inline-flex items-center text-xs text-gray-500 dark:text-gray-400'>
 								<i className='fa-regular fa-calendar mr-1'></i>

@@ -116,6 +116,13 @@ export const translations = {
 		optionsAdminOnlyHint:
 			'Os teus datos persoais e preferencias pódense cambiar coa icona de engrenaxe na barra lateral (abre a pantalla de axustes).',
 		profileImage: 'Imaxe de perfil',
+		googleCalendarIcalTitle: 'Sincronización Google Calendar (iCal)',
+		googleCalendarIcalHelp:
+			'Pega ata 3 ligazóns secretas iCal de Google Calendar para amosar eventos no calendario.',
+		googleCalendarLabel: 'Google Calendar',
+		googleCalendarSourceLabel: 'Calendario',
+		googleCalendarLoading: 'Sincronizando calendarios de Google...',
+		googleCalendarLoadError: 'Non foi posible cargar os calendarios iCal configurados.',
 		currentLanguage: 'Idioma actual',
 		currentTheme: 'Tema actual',
 		defaultLanguage: 'Idioma predeterminado',
@@ -316,6 +323,13 @@ export const translations = {
 		optionsAdminOnlyHint:
 			'Tus datos personales y preferencias se pueden cambiar con el icono de engranaje en la barra lateral (abre la pantalla de ajustes).',
 		profileImage: 'Imagen de perfil',
+		googleCalendarIcalTitle: 'Sincronización Google Calendar (iCal)',
+		googleCalendarIcalHelp:
+			'Pega hasta 3 enlaces secretos iCal de Google Calendar para mostrar eventos en el calendario.',
+		googleCalendarLabel: 'Google Calendar',
+		googleCalendarSourceLabel: 'Calendario',
+		googleCalendarLoading: 'Sincronizando calendarios de Google...',
+		googleCalendarLoadError: 'No se pudieron cargar los calendarios iCal configurados.',
 		currentLanguage: 'Idioma actual',
 		currentTheme: 'Tema actual',
 		defaultLanguage: 'Idioma predeterminado',
@@ -516,6 +530,13 @@ export const translations = {
 		optionsAdminOnlyHint:
 			'You can change your profile and preferences using the gear icon in the sidebar (opens the settings screen).',
 		profileImage: 'Profile image',
+		googleCalendarIcalTitle: 'Google Calendar sync (iCal)',
+		googleCalendarIcalHelp:
+			'Paste up to 3 secret Google Calendar iCal links to show events in the calendar.',
+		googleCalendarLabel: 'Google Calendar',
+		googleCalendarSourceLabel: 'Calendar',
+		googleCalendarLoading: 'Syncing Google calendars...',
+		googleCalendarLoadError: 'Could not load configured iCal calendars.',
 		currentLanguage: 'Current language',
 		currentTheme: 'Current theme',
 		defaultLanguage: 'Default language',
