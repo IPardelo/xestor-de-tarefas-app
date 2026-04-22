@@ -53,7 +53,6 @@ const ElementoTarea = ({ tarea }) => {
 	const prioridad = prioridades[tarea.prioridad] || prioridades.media;
 	const tipoTarea = tarea.tipo === 'reunion' ? 'reunion' : 'tarea';
 	const etiquetaTipo = tipoTarea === 'reunion' ? t.taskTypeMeeting : t.taskTypeTask;
-	const asignadaA = usuarios.find((u) => u.id === tarea.asignadaAId);
 	const colaborador = (tarea.compartidaConIds || [])
 		.map((id) => usuarios.find((u) => u.id === id))
 		.find(Boolean);
@@ -264,7 +263,7 @@ const ElementoTarea = ({ tarea }) => {
 			onMouseLeave={() => setMostrarAcciones(false)}
 			onTouchStart={() => setMostrarAcciones(true)}>
 			<div className='p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4'>
-				<div className='flex-none'>
+				<div className='flex items-center gap-2 sm:gap-3 flex-none'>
 					<motion.button
 						whileHover={{ scale: 1.1 }}
 						whileTap={{ scale: 0.9 }}
@@ -277,6 +276,17 @@ const ElementoTarea = ({ tarea }) => {
 						}`}>
 						{tarea.completada && <i className='fa-solid fa-check text-white text-xs'></i>}
 					</motion.button>
+					{proxectoVinculado && (
+						<span
+							className='inline-flex items-center text-xs px-2.5 py-1 rounded-full whitespace-nowrap'
+							style={{
+								backgroundColor: corHexARgba(proxectoVinculado.cor, 0.16),
+								color: proxectoVinculado.cor || '#9333ea',
+							}}>
+							<i className='fa-solid fa-folder-tree mr-1'></i>
+							{proxectoVinculado.nome}
+						</span>
+					)}
 				</div>
 
 				<div
@@ -312,27 +322,10 @@ const ElementoTarea = ({ tarea }) => {
 							<i className={`${prioridad.icon} mr-1`}></i>
 							{prioridad.label}
 						</span>
-						{asignadaA && (
-							<span className='inline-flex items-center text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'>
-								<i className='fa-solid fa-user-check mr-1'></i>
-								{t.assignedToLabel}: {asignadaA.nome}
-							</span>
-						)}
 						{colaborador && (
 							<span className='inline-flex items-center text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300'>
 								<i className='fa-solid fa-users mr-1'></i>
 								{t.sharedWithLabel}: {colaborador.nome}
-							</span>
-						)}
-						{proxectoVinculado && (
-							<span
-								className='inline-flex items-center text-xs px-2.5 py-1 rounded-full'
-								style={{
-									backgroundColor: corHexARgba(proxectoVinculado.cor, 0.16),
-									color: proxectoVinculado.cor || '#9333ea',
-								}}>
-								<i className='fa-solid fa-folder-tree mr-1'></i>
-								{t.taskProject}: {proxectoVinculado.nome}
 							</span>
 						)}
 					</div>
