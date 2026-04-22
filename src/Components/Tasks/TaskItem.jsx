@@ -27,7 +27,6 @@ const ElementoTarea = ({ tarea }) => {
 	const proxectos = useSelector(seleccionarProxectos);
 	const outrosUsuarios = usuarios.filter((u) => u.id !== usuarioActualId);
 	const t = translations[idioma] || translations.gl;
-	const [mostrarAcciones, setMostrarAcciones] = useState(false);
 	const [estaEditando, setEstaEditando] = useState(false);
 	const [tareaEditada, setTareaEditada] = useState(tarea);
 
@@ -259,9 +258,7 @@ const ElementoTarea = ({ tarea }) => {
 						? 'border-l-4 border-green-500 dark:border-green-600'
 						: 'border-l-4 border-indigo-500 dark:border-indigo-600'
 				}`}
-			onMouseEnter={() => setMostrarAcciones(true)}
-			onMouseLeave={() => setMostrarAcciones(false)}
-			onTouchStart={() => setMostrarAcciones(true)}>
+			>
 			<div className='p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4'>
 				<div className='flex items-center gap-2 sm:gap-3 flex-none'>
 					<motion.button
@@ -330,36 +327,35 @@ const ElementoTarea = ({ tarea }) => {
 						)}
 					</div>
 				</div>
-				<motion.div
-					className='flex gap-2 self-end sm:self-center'
-					initial={{ opacity: 0 }}
-					animate={{ opacity: mostrarAcciones ? 1 : 0 }}>
-					<motion.button
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.9 }}
-						onClick={() => {
-							setTareaEditada({
-								...tarea,
-								proxectoId: tarea.proxectoId || '',
-								asignadaAId: tarea.asignadaAId || usuarioActualId,
-								compartidaConIds: Array.isArray(tarea.compartidaConIds) ? tarea.compartidaConIds : [],
-							});
-							setEstaEditando(true);
-						}}
-						className='w-8 h-8 rounded-full text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors'
-						aria-label={t.editTask}>
-						<i className='fa-solid fa-pen-to-square'></i>
-					</motion.button>
+				{!tarea.completada && (
+					<div className='flex gap-2 self-end sm:self-center'>
+						<motion.button
+							whileHover={{ scale: 1.1 }}
+							whileTap={{ scale: 0.9 }}
+							onClick={() => {
+								setTareaEditada({
+									...tarea,
+									proxectoId: tarea.proxectoId || '',
+									asignadaAId: tarea.asignadaAId || usuarioActualId,
+									compartidaConIds: Array.isArray(tarea.compartidaConIds) ? tarea.compartidaConIds : [],
+								});
+								setEstaEditando(true);
+							}}
+							className='w-8 h-8 rounded-full text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors'
+							aria-label={t.editTask}>
+							<i className='fa-solid fa-pen-to-square'></i>
+						</motion.button>
 
-					<motion.button
-						whileHover={{ scale: 1.1, color: '#ef4444' }}
-						whileTap={{ scale: 0.9 }}
-						onClick={() => dispatch(eliminarTarea({ id: tarea.id, usuarioId: usuarioActualId }))}
-						className='w-8 h-8 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors'
-						aria-label={t.deleteTask}>
-						<i className='fa-solid fa-trash-can'></i>
-					</motion.button>
-				</motion.div>
+						<motion.button
+							whileHover={{ scale: 1.1, color: '#ef4444' }}
+							whileTap={{ scale: 0.9 }}
+							onClick={() => dispatch(eliminarTarea({ id: tarea.id, usuarioId: usuarioActualId }))}
+							className='w-8 h-8 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors'
+							aria-label={t.deleteTask}>
+							<i className='fa-solid fa-trash-can'></i>
+						</motion.button>
+					</div>
+				)}
 			</div>
 		</motion.div>
 	);
