@@ -11,16 +11,39 @@ Inclúe multiusuario local, proxectos, calendario, internacionalización (`gl`/`
 
 ![XestorDeTarefas Screenshot](public/Images/Interfaz.gif)
 
+## Evolución por versión
+
+### v2.0.0
+
+- Novo módulo de **Notas**.
+- Accións en notas: crear, editar, eliminar, fixar e marcar ítems.
+
+### v1.1.0
+
+- Melloras de UI e organización da app para uso diario.
+- Compoñenente de login.
+- Integración co calendario de Google.
+
+### v1.0.0
+
+- Base da aplicación de xestión de tarefas.
+- Crear, editar, eliminar e completar tarefas.
+- Filtros, busca e ordenación de tarefas.
+- Persistencia local no dispositivo.
+- Soporte de tema claro/escuro e internacionalización inicial (`gl`/`es`/`en`).
+- Ampliación funcional con módulo de proxectos.
+- Xestión de usuarios en local con rol administrador.
+- Vista de calendario anual/mensual.
+
 ## Características actuais
 
 - Xestión de tarefas: crear, editar, eliminar, completar, buscar, filtrar e ordenar.
-- Campos de tarefa: título, descrición, tipo (`Tarefa` ou `Reunión`), prioridade, data límite, proxecto, asignación e compartición.
-- Regras de formulario: na creación de tarefas todos os campos son obrigatorios agás data límite e compartir con.
-- Xestión de usuarios en local (con rol admin) e cambio de usuario.
+- Módulo de notas: notas de texto e notas tipo lista/checklist con cor personalizada.
+- Ordenación de notas por fixación e última actualización.
+- Xestión de usuarios.
 - Xestión de proxectos con datos de cliente.
-- Vista de calendario anual/mensual.
+- Vista de calendario anual/mensual con sincronización con Google Calendar.
 - Persistencia e sincronización con Firebase Firestore (estado compartido).
-- Tema da app adaptado ao modo claro/escuro do sistema Android.
 
 ## Requisitos
 
@@ -86,8 +109,8 @@ A app usa Firestore como persistencia principal e sincroniza cambios entre sesi�
 ```text
 src/
   App/                # Store e persistencia
-  Components/         # UI por áreas (Tasks, Projects, Layout, Options...)
-  Features/           # Slices Redux (Tasks, Users, Projects, Theme, Language)
+  Components/         # UI por áreas (Tasks, Projects, Notes, Layout, Options...)
+  Features/           # Slices Redux (Tasks, Users, Projects, Notes, Theme, Language)
   i18n/               # Traducións
 android/              # Proxecto nativo Android (Capacitor)
 capacitor.config.json # Configuración de integración nativa
