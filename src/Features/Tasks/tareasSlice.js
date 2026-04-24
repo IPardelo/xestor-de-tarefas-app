@@ -55,6 +55,7 @@ const cargarTareasDelAlmacenamiento = () => {
 const estadoInicial = {
 	tareas: cargarTareasDelAlmacenamiento(),
 	filtro: 'todos',
+	filtroProxecto: 'todos',
 	busqueda: '',
 	ordenarPor: 'fechaCreacion:desc',
 	estado: 'inactivo',
@@ -69,6 +70,7 @@ export const tareasSlice = createSlice({
 			const payload = action.payload || {};
 			if (Array.isArray(payload.tareas)) state.tareas = payload.tareas;
 			if (typeof payload.filtro === 'string') state.filtro = payload.filtro;
+			if (typeof payload.filtroProxecto === 'string') state.filtroProxecto = payload.filtroProxecto;
 			if (typeof payload.busqueda === 'string') state.busqueda = payload.busqueda;
 			if (typeof payload.ordenarPor === 'string') state.ordenarPor = payload.ordenarPor;
 		},
@@ -154,6 +156,9 @@ export const tareasSlice = createSlice({
 		establecerFiltro: (state, action) => {
 			state.filtro = action.payload;
 		},
+		establecerFiltroProxecto: (state, action) => {
+			state.filtroProxecto = action.payload;
+		},
 
 		establecerBusqueda: (state, action) => {
 			state.busqueda = action.payload;
@@ -185,6 +190,7 @@ export const {
 	alternarEstadoTarea,
 	actualizarTarea,
 	establecerFiltro,
+	establecerFiltroProxecto,
 	establecerBusqueda,
 	establecerOrdenamiento,
 	limpiarTareas,
@@ -202,10 +208,11 @@ export const seleccionarTareasFiltradas = createSelector(
 	[
 		(state) => seleccionarTodasLasTareas(state),
 		(state) => state.tareas?.filtro || 'todos',
+		(state) => state.tareas?.filtroProxecto || 'todos',
 		(state) => state.tareas?.busqueda || '',
 		(state) => state.tareas?.ordenarPor || 'fechaCreacion:desc',
 	],
-	(tareas, filtro, busqueda, ordenarPor) => {
+	(tareas, filtro, filtroProxecto, busqueda, ordenarPor) => {
 		let tareasFiltradas = tareas.filter(
 			(tarea) => tarea !== null && tarea !== undefined && typeof tarea === 'object'
 		);
@@ -223,6 +230,15 @@ export const seleccionarTareasFiltradas = createSelector(
 			case 'baja':
 				tareasFiltradas = tareasFiltradas.filter((tarea) => tarea.prioridad === filtro);
 				break;
+		}
+
+		// Aplicar filtro por proyecto
+		if (filtroProxecto !== 'todos') {
+			if (filtroProxecto === 'sen-proxecto') {
+				tareasFiltradas = tareasFiltradas.filter((tarea) => !tarea.proxectoId);
+			} else {
+				tareasFiltradas = tareasFiltradas.filter((tarea) => tarea.proxectoId === filtroProxecto);
+			}
 		}
 
 		// Aplicar búsqueda
@@ -257,6 +273,7 @@ export const seleccionarTareasFiltradas = createSelector(
 );
 
 export const seleccionarFiltroActivo = (state) => state.tareas?.filtro || 'todos';
+export const seleccionarFiltroProxectoActivo = (state) => state.tareas?.filtroProxecto || 'todos';
 
 // Contador de tareas por filtro para mostrar badges
 export const seleccionarConteoTareas = createSelector([seleccionarTodasLasTareas], (tareas) => {
@@ -273,6 +290,24 @@ export const seleccionarConteoTareas = createSelector([seleccionarTodasLasTareas
 		baja: tareasValidas.filter((tarea) => tarea.prioridad === 'baja').length,
 	};
 });
+
+export const seleccionarConteoTarefasPorProxecto = createSelector(
+	[seleccionarTodasLasTareas],
+	(tareas) => {
+		const tarefasValidas = (tareas || []).filter((tarea) => tarea !== null && tarea !== undefined);
+		const conteo = {
+			todos: tarefasValidas.length,
+			'sen-proxecto': tarefasValidas.filter((tarea) => !tarea.proxectoId).length,
+		};
+
+		tarefasValidas.forEach((tarea) => {
+			if (!tarea.proxectoId) return;
+			conteo[tarea.proxectoId] = (conteo[tarea.proxectoId] || 0) + 1;
+		});
+
+		return conteo;
+	}
+);
 
 // Selector para obtener una tarea por ID
 export const seleccionarTareaPorId = (state, idTarea) => {
