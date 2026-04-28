@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -49,6 +49,8 @@ export default function NotesView() {
 		itensLista: [],
 		textoLista: '',
 	});
+	const novaListaRef = useRef(null);
+	const borradorListaRef = useRef(null);
 
 	const limparNovaNota = () =>
 		setNovaNota({
@@ -69,9 +71,22 @@ export default function NotesView() {
 		return limpo.trim() ? `☐ ${limpo.trim()}` : '☐ ';
 	};
 
-	const textoConCasillas = (texto) => {
-		const liñas = String(texto || '').split('\n');
+	const obterEstadoCasilla = (liña) => /^\s*(?:[-*]\s*)?(?:\[(?:x|X)\]|☑)\s*/.test(String(liña || ''));
+
+	const textoConCasillas = (textoOuItens) => {
+		if (Array.isArray(textoOuItens)) {
+			return textoOuItens
+				.map((item) => `${item?.completado ? '☑' : '☐'} ${String(item?.texto || '').trim()}`.trimEnd())
+				.join('\n');
+		}
+		const liñas = String(textoOuItens || '').split('\n');
 		return liñas.map(engadirPrefixoCasilla).join('\n');
+	};
+
+	const axustarAlturaTextarea = (textarea) => {
+		if (!textarea) return;
+		textarea.style.height = 'auto';
+		textarea.style.height = `${textarea.scrollHeight}px`;
 	};
 
 	const inserirLiñaConCasilla = (event, value, onChange) => {
@@ -97,12 +112,15 @@ export default function NotesView() {
 	const textoAItensLista = (texto, itensPrevios = []) =>
 		String(texto || '')
 			.split('\n')
-			.map((liña) => limparPrefixoCasilla(liña).trim())
-			.filter(Boolean)
+			.map((liña) => ({
+				texto: limparPrefixoCasilla(liña).trim(),
+				completado: obterEstadoCasilla(liña),
+			}))
+			.filter((item) => item.texto)
 			.map((liña, indice) => ({
 				id: itensPrevios[indice]?.id || nanoid(),
-				texto: liña,
-				completado: Boolean(itensPrevios[indice]?.completado),
+				texto: liña.texto,
+				completado: liña.completado,
 			}));
 
 	const gardarNovaNota = (e) => {
@@ -126,14 +144,13 @@ export default function NotesView() {
 
 	const comezarEdicion = (nota) => {
 		setEditandoId(nota.id);
-		const textoListaBase = Array.isArray(nota.itensLista) ? nota.itensLista.map((item) => item.texto).join('\n') : '';
 		setBorrador({
 			titulo: nota.titulo || '',
 			contido: nota.contido || '',
 			tipo: nota.tipo === 'lista' ? 'lista' : 'texto',
 			cor: nota.cor || '#9333ea',
 			itensLista: Array.isArray(nota.itensLista) ? nota.itensLista : [],
-			textoLista: textoConCasillas(textoListaBase),
+			textoLista: textoConCasillas(nota.itensLista || []),
 		});
 	};
 
@@ -153,6 +170,28 @@ export default function NotesView() {
 		setEditandoId(null);
 		showToast(t.toastNoteSaved);
 	};
+
+	const onChangeListaNovaNota = (novoTexto) =>
+		setNovaNota((prev) => ({
+			...prev,
+			textoLista: novoTexto,
+			itensLista: textoAItensLista(novoTexto, prev.itensLista),
+		}));
+
+	const onChangeListaBorrador = (novoTexto) =>
+		setBorrador((prev) => ({
+			...prev,
+			textoLista: novoTexto,
+			itensLista: textoAItensLista(novoTexto, prev.itensLista),
+		}));
+
+	useEffect(() => {
+		axustarAlturaTextarea(novaListaRef.current);
+	}, [novaNota.textoLista, novaNota.tipo, expandidoNovaNota]);
+
+	useEffect(() => {
+		axustarAlturaTextarea(borradorListaRef.current);
+	}, [borrador.textoLista, borrador.tipo, editandoId]);
 
 	return (
 		<div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 transition-colors duration-300'>
@@ -242,32 +281,28 @@ export default function NotesView() {
 							) : (
 								<div className='space-y-2'>
 									<textarea
+										ref={novaListaRef}
 										value={novaNota.textoLista}
+										onInput={(e) => axustarAlturaTextarea(e.currentTarget)}
 										onFocus={() =>
-											setNovaNota((prev) => ({
-												...prev,
-												textoLista: prev.textoLista ? prev.textoLista : '☐ ',
-											}))
-										}
-										onChange={(e) =>
-											setNovaNota((prev) => ({
-												...prev,
-												textoLista: e.target.value,
-												itensLista: textoAItensLista(e.target.value, prev.itensLista),
-											}))
-										}
-										onKeyDown={(e) =>
-											inserirLiñaConCasilla(e, novaNota.textoLista, (novoTexto) =>
-												setNovaNota((prev) => ({
+											setNovaNota((prev) => {
+												const novoTexto = prev.textoLista ? prev.textoLista : '☐ ';
+												requestAnimationFrame(() => axustarAlturaTextarea(novaListaRef.current));
+												return {
 													...prev,
 													textoLista: novoTexto,
-													itensLista: textoAItensLista(novoTexto, prev.itensLista),
-												}))
+												};
+											})
+										}
+										onChange={(e) => onChangeListaNovaNota(e.target.value)}
+										onKeyDown={(e) =>
+											inserirLiñaConCasilla(e, novaNota.textoLista, (novoTexto) =>
+												onChangeListaNovaNota(novoTexto)
 											)
 										}
 										placeholder={t.noteChecklistItemPlaceholder}
 										rows='5'
-										className='w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 resize-none'
+										className='w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 overflow-hidden resize-none'
 									/>
 								</div>
 							)}
@@ -418,32 +453,28 @@ export default function NotesView() {
 										) : (
 											<div className='mt-1 space-y-2'>
 												<textarea
+													ref={borradorListaRef}
 													value={borrador.textoLista}
+													onInput={(e) => axustarAlturaTextarea(e.currentTarget)}
 													onFocus={() =>
-														setBorrador((prev) => ({
-															...prev,
-															textoLista: prev.textoLista ? prev.textoLista : '☐ ',
-														}))
-													}
-													onChange={(e) =>
-														setBorrador((prev) => ({
-															...prev,
-															textoLista: e.target.value,
-															itensLista: textoAItensLista(e.target.value, prev.itensLista),
-														}))
-													}
-													onKeyDown={(e) =>
-														inserirLiñaConCasilla(e, borrador.textoLista, (novoTexto) =>
-															setBorrador((prev) => ({
+														setBorrador((prev) => {
+															const novoTexto = prev.textoLista ? prev.textoLista : '☐ ';
+															requestAnimationFrame(() => axustarAlturaTextarea(borradorListaRef.current));
+															return {
 																...prev,
 																textoLista: novoTexto,
-																itensLista: textoAItensLista(novoTexto, prev.itensLista),
-															}))
+															};
+														})
+													}
+													onChange={(e) => onChangeListaBorrador(e.target.value)}
+													onKeyDown={(e) =>
+														inserirLiñaConCasilla(e, borrador.textoLista, (novoTexto) =>
+															onChangeListaBorrador(novoTexto)
 														)
 													}
 													placeholder={t.noteChecklistItemPlaceholder}
 													rows='5'
-													className='w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/60 resize-none'
+													className='w-full px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/60 overflow-hidden resize-none'
 												/>
 											</div>
 										)}
@@ -485,7 +516,7 @@ export default function NotesView() {
 										{nota.tipo === 'lista' && (
 											<ul className='space-y-1'>
 												{(nota.itensLista || []).map((item) => (
-													<li key={item.id} className='flex items-center gap-2 text-sm'>
+													<li key={item.id} className='flex items-start gap-2 text-sm'>
 														<input
 															type='checkbox'
 															checked={Boolean(item.completado)}
@@ -498,7 +529,7 @@ export default function NotesView() {
 																	})
 																)
 															}
-															className='accent-indigo-600'
+															className='accent-indigo-600 mt-0.5'
 														/>
 														<span className={item.completado ? 'line-through opacity-85' : ''}>
 															{item.texto}
