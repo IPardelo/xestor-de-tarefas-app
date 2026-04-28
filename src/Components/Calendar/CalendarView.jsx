@@ -214,6 +214,7 @@ export default function CalendarView() {
 	const now = new Date();
 	const [selectedYear, setSelectedYear] = useState(now.getFullYear());
 	const [selectedMonth, setSelectedMonth] = useState(null);
+	const [selectedDay, setSelectedDay] = useState(null);
 	const [eventosIcal, setEventosIcal] = useState([]);
 	const [icalLoading, setIcalLoading] = useState(false);
 	const [icalError, setIcalError] = useState('');
@@ -405,7 +406,10 @@ export default function CalendarView() {
 								type='button'
 								key={month}
 								whileHover={{ y: -2 }}
-								onClick={() => setSelectedMonth(month)}
+								onClick={() => {
+									setSelectedMonth(month);
+									setSelectedDay(null);
+								}}
 								className='text-left border border-gray-200 dark:border-gray-700 rounded-xl p-3 bg-gray-50 dark:bg-gray-700/40'>
 								<div className='flex justify-between items-center mb-2'>
 									<h3 className='capitalize font-semibold text-gray-800 dark:text-white'>{monthName}</h3>
@@ -451,6 +455,74 @@ export default function CalendarView() {
 		.filter((task) => ensureDate(task?._dueDate))
 		.sort((a, b) => ensureDate(a._dueDate) - ensureDate(b._dueDate));
 	const monthGrid = getMonthGrid(selectedYear, selectedMonth, weekStart);
+	const monthTasksByDay = (() => {
+		const map = new Map();
+		monthTasks.forEach((task) => {
+			const dueDate = ensureDate(task?._dueDate);
+			if (!dueDate) return;
+			const day = dueDate.getDate();
+			if (!map.has(day)) map.set(day, []);
+			map.get(day).push(task);
+		});
+		return map;
+	})();
+	const visibleTasks =
+		selectedDay === null ? monthTasks : monthTasksByDay.get(selectedDay)?.slice().sort((a, b) => ensureDate(a._dueDate) - ensureDate(b._dueDate)) || [];
+	const formatoDiaMes = new Intl.DateTimeFormat(locale, {
+		day: '2-digit',
+		month: 'long',
+	});
+	const listTitle =
+		selectedDay === null
+			? t.monthTasksList
+			: `${t.dayTasksList || t.monthTasksList} ${formatoDiaMes.format(
+					new Date(selectedYear, selectedMonth, selectedDay)
+				)}`;
+
+	const obterEstiloCalendarioIcal = (calendarIndex) => {
+		if (calendarIndex === 1) {
+			return { cor: '#0ea5e9', icono: 'fa-calendar-days' };
+		}
+		if (calendarIndex === 2) {
+			return { cor: '#a855f7', icono: 'fa-calendar-day' };
+		}
+		if (calendarIndex === 3) {
+			return { cor: '#f59e0b', icono: 'fa-calendar-week' };
+		}
+		return { cor: '#6366f1', icono: 'fa-calendar' };
+	};
+
+	const obterTiposPorDia = (day) => {
+		const items = monthTasksByDay.get(day) || [];
+		const vistos = new Set();
+		return items
+			.map((task) => {
+				if (task.orixe === 'ical') {
+					const key = `cal-${task.calendarIndex || 0}`;
+					if (vistos.has(key)) return null;
+					vistos.add(key);
+					const estilo = obterEstiloCalendarioIcal(task.calendarIndex);
+					return {
+						key,
+						cor: estilo.cor,
+						icono: estilo.icono,
+						titulo: task.fonte || t.googleCalendarLabel,
+					};
+				}
+				const proxectoVinculado = proxectosSeguros.find((p) => p.id === task.proxectoId);
+				const key = `proj-${proxectoVinculado?.id || 'none'}`;
+				if (vistos.has(key)) return null;
+				vistos.add(key);
+				return {
+					key,
+					cor: proxectoVinculado?.cor || '#6366f1',
+					icono: 'fa-folder-tree',
+					titulo: proxectoVinculado?.nome || t.taskProject,
+				};
+			})
+			.filter(Boolean)
+			.slice(0, 2);
+	};
 
 	return (
 		<motion.div
@@ -469,7 +541,10 @@ export default function CalendarView() {
 				<div className='flex items-center gap-2'>
 					<button
 						type='button'
-						onClick={() => setSelectedMonth(null)}
+						onClick={() => {
+							setSelectedMonth(null);
+							setSelectedDay(null);
+						}}
 						className='px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'>
 						<i className='fa-solid fa-arrow-left mr-2'></i>
 						{t.backToYear}
@@ -489,39 +564,64 @@ export default function CalendarView() {
 			</div>
 			<div className='grid grid-cols-7 gap-2 mb-6'>
 				{monthGrid.map((day, idx) => {
-					const taskCount = day
-						? monthTasks.filter((task) => ensureDate(task._dueDate)?.getDate() === day).length
-						: 0;
+					const tiposDia = day ? obterTiposPorDia(day) : [];
 					return (
-						<div
+						<button
+							type='button'
 							key={idx}
-							className={`min-h-20 rounded-lg border p-2 ${
+							onClick={() => {
+								if (!day) return;
+								setSelectedDay(day);
+							}}
+							className={`min-h-20 rounded-lg border p-2 text-left transition-colors relative ${
 								day
-									? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40'
+									? `border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40 hover:bg-white dark:hover:bg-gray-700 ${
+											selectedDay === day ? 'ring-2 ring-indigo-500 dark:ring-indigo-400' : ''
+										}`
 									: 'border-transparent'
 							}`}>
 							{day && (
 								<>
-									<div className='text-sm font-semibold text-gray-700 dark:text-gray-200'>{day}</div>
-									{taskCount > 0 && (
-										<div className='mt-1 text-xs text-indigo-600 dark:text-indigo-300'>
-											{taskCount} {t.calendarTasksBadge}
-										</div>
-									)}
+									<div className='absolute top-2 left-2 text-sm font-semibold text-gray-700 dark:text-gray-200'>
+										{day}
+									</div>
+									<div className='mt-7 flex flex-wrap gap-1.5 max-w-[98px]'>
+											{tiposDia.map((tipo) => (
+												<span
+													key={tipo.key}
+													title={tipo.titulo}
+													className='inline-flex items-center justify-center w-8 h-8 rounded-full'
+													style={{ backgroundColor: corHexARgba(tipo.cor, 0.18), color: tipo.cor }}>
+													<i className={`fa-solid ${tipo.icono} text-sm`}></i>
+												</span>
+											))}
+									</div>
+									{/* Sen contador numérico: só iconas de tipo por día */}
 								</>
 							)}
-						</div>
+						</button>
 					);
 				})}
 			</div>
 
 			<div className='border-t border-gray-200 dark:border-gray-700 pt-4'>
-				<h3 className='text-lg font-semibold text-gray-800 dark:text-white mb-3'>{t.monthTasksList}</h3>
-				{monthTasks.length === 0 ? (
+				<div className='flex flex-wrap items-center justify-between gap-2 mb-3'>
+					<h3 className='text-lg font-semibold text-gray-800 dark:text-white'>{listTitle}</h3>
+					{selectedDay !== null && (
+						<button
+							type='button'
+							onClick={() => setSelectedDay(null)}
+							className='px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm'>
+							<i className='fa-solid fa-rotate-left mr-2'></i>
+							{t.backToMonth}
+						</button>
+					)}
+				</div>
+				{visibleTasks.length === 0 ? (
 					<p className='text-gray-500 dark:text-gray-400'>{t.noMonthTasks}</p>
 				) : (
 					<ul className='space-y-3'>
-						{monthTasks.map((task) => {
+						{visibleTasks.map((task) => {
 							const proxectoVinculado = proxectosSeguros.find((p) => p.id === task.proxectoId);
 							const corLateralIcal =
 								task.calendarIndex === 1

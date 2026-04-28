@@ -1,17 +1,98 @@
-# XestorDeTarefas Android
+<div align="center">
 
-Aplicación Android de xestión persoal de tarefas e proxectos feita con React + Redux Toolkit + Capacitor.
+![XestorDeTarefas Screenshot](public/Images/banner.PNG)
 
-## Repositorios
+<br>
 
-- Android (este repo): [IPardelo/xestor-de-tarefas-app](https://github.com/IPardelo/xestor-de-tarefas-app)
-- Web/escritorio: [IPardelo/xestor-de-tarefas-web](https://github.com/IPardelo/xestor-de-tarefas-web)
+**Aplicación de xestión persoal de tarefas e proxectos**
 
-Inclúe multiusuario local, proxectos, calendario, internacionalización (`gl`/`es`/`en`) e sincronización multi-dispositivo con Firebase Firestore.
+Planifica o teu día, crea e completa tarefas, agrupa o traballo por proxectos e cliente,
+garda notas e listas de comprobación, e revisa todo no calendario — no ordenador ou no
+móbil, sincronizado entre dispositivos e detrás do teu propio inicio de sesión. Sen subscrición, sen anuncios, cos teus datos na túa propia Firebase.
 
-![XestorDeTarefas Screenshot](public/Images/Interfaz.gif)
+<br>
+
+[![Licenza](https://img.shields.io/badge/licenza-MIT-22c55e?style=flat-square)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Android](https://img.shields.io/badge/app%20Android-repo-3ddc84?style=flat-square&logo=android&logoColor=white)](https://github.com/IPardelo/xestor-de-tarefas-app)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Redux Toolkit](https://img.shields.io/badge/Redux%20Toolkit-2.6-764ABC?style=flat-square&logo=redux&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-6-007FFF?style=flat-square&logo=mui&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer%20Motion-12-0055FF?style=flat-square&logo=framer&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)
+![ESLint](https://img.shields.io/badge/ESLint-9-4B32C3?style=flat-square&logo=eslint&logoColor=white)
+![KeePass](https://img.shields.io/badge/KDBX-kdbxweb-6ABF4B?style=flat-square&logo=keepassxc&logoColor=white)
+
+<img src="public/Images/Interfaz.gif" alt="Inicio" width="230">
+
+</div>
+
+## Por que
+
+As aplicacións de tarefas comerciais pídenche unha conta nun servidor alleo, gardan os teus
+datos onde non ves, e tarde ou cedo poñen detrás dun pago o que antes era gratis.
+XestorDeTarefas nace da idea contraria: **a app é túa e os datos tamén**.
+
+- Os datos viven no teu propio proxecto de Firebase, non nun servizo de terceiros.
+- Todo nun só sitio: tarefas, proxectos con cliente, notas e calendario, sen saltar entre apps.
+- O mesmo estado no ordenador e no móbil, sincronizado ao instante.
+- Pensada en galego dende o primeiro día (e tamén en castelán e inglés).
+- Sen subscrición, sen anuncios, sen límites artificiais. Código aberto con licenza MIT.
+
+## Funcionalidades
+
+- ✅ Xestión de tarefas: crear, editar, eliminar, completar, buscar, filtrar e ordenar.
+- 📝 Módulo de notas: notas de texto e notas tipo lista/checklist con cor personalizada.
+- 📌 Ordenación de notas por fixación e última actualización.
+- 👥 Xestión de usuarios.
+- 📁 Xestión de proxectos con datos de cliente.
+- 📅 Vista de calendario anual/mensual con sincronización con Google Calendar.
+- 🔥 Persistencia e sincronización con Firebase Firestore (estado compartido).
+- 🔑 Lectura de credenciais KDBX (KeePass) dos proxectos, restrinxida a admin.
+
+## Configuración
+
+### Requisitos
+
+- Node.js 18+ (recomendado 20+)
+- npm
+- Windows, Linux ou macOS
+
+### 🔥 Firebase
+
+Para usar a mesma app desde dous ordenadores/móbiles e compartir cambios:
+
+1) Crea un proxecto en Firebase e activa Firestore.
+2) Enche cos datos necesarios o arquivo `.env.example` na raíz do proxecto e renomeao a `.env`.
+4) Arranca a app (`npm run dev` ou `iniciar-app.bat`) nos dispositivos que queiras.
+
+A app usa Firestore como persistencia principal e sincroniza cambios entre sesións.
+
+### 🔒 KDBX (KeePass)
+
+- A lectura de KDBX está dispoñible desde Proxectos e restrinxida a usuario admin.
+- Requírese ruta e contrasinal válidas.
+- A base KDBX con Argon2 está soportada na execución local do proxecto.
+
+## Estrutura xeral
+
+```text
+src/
+  App/                # Store e persistencia
+  Components/         # UI por áreas (Tasks, Projects, Layout, Options...)
+  Features/           # Slices Redux (Tasks, Users, Projects, Theme, Language)
+  i18n/               # Traducións
+vite.config.js        # Configuración Vite + endpoint local de KDBX
+```
 
 ## Evolución por versión
+
+### v2.1.0
+
+- Visualización por días no calendario
+- Melloras visuais en todos os módulos
 
 ### v2.0.0
 
@@ -34,100 +115,6 @@ Inclúe multiusuario local, proxectos, calendario, internacionalización (`gl`/`
 - Ampliación funcional con módulo de proxectos.
 - Xestión de usuarios en local con rol administrador.
 - Vista de calendario anual/mensual.
-
-## Características actuais
-
-- Xestión de tarefas: crear, editar, eliminar, completar, buscar, filtrar e ordenar.
-- Módulo de notas: notas de texto e notas tipo lista/checklist con cor personalizada.
-- Ordenación de notas por fixación e última actualización.
-- Xestión de usuarios.
-- Xestión de proxectos con datos de cliente.
-- Vista de calendario anual/mensual con sincronización con Google Calendar.
-- Persistencia e sincronización con Firebase Firestore (estado compartido).
-
-## Requisitos
-
-- Node.js 18+ (recomendado 20+)
-- npm
-- Android Studio
-- Android SDK
-- Dispositivo Android ou emulador
-
-## Configuración
-
-1) Instalar dependencias:
-
-```bash
-npm install
-```
-
-2) Configurar Firebase:
-
-- copia `.env.example` a `.env`
-- completa as variables `VITE_FIREBASE_*`
-
-## Arranque en Android
-
-1) Compilar a app web e sincronizar con Android:
-
-```bash
-npm run android:sync
-```
-
-2) Abrir o proxecto nativo:
-
-```bash
-npm run android:open
-```
-
-3) En Android Studio:
-
-- espera ao sync de Gradle
-- selecciona dispositivo/emulador
-- preme **Run**
-
-## Scripts dispoñibles
-
-- `npm run android:sync` - build web + sync Android.
-- `npm run android:open` - abre Android Studio.
-- `npm run android:run` - sync e execución directa.
-- `npm run build` - build web de produción.
-- `npm run lint` - lint do código.
-
-## Modo multiusuario real (Firebase)
-
-Para usar a mesma app desde varios dispositivos Android e compartir cambios:
-
-1) Crea un proxecto en Firebase e activa Firestore.
-2) Enche cos datos necesarios o arquivo `.env.example` na raíz do proxecto e renomeao a `.env`.
-3) Executa o fluxo Android (`npm run android:sync` + `npm run android:open`) nos dispositivos que queiras.
-
-A app usa Firestore como persistencia principal e sincroniza cambios entre sesións.
-
-## Estrutura xeral
-
-```text
-src/
-  App/                # Store e persistencia
-  Components/         # UI por áreas (Tasks, Projects, Notes, Layout, Options...)
-  Features/           # Slices Redux (Tasks, Users, Projects, Notes, Theme, Language)
-  i18n/               # Traducións
-android/              # Proxecto nativo Android (Capacitor)
-capacitor.config.json # Configuración de integración nativa
-```
-
-## Tecnoloxías
-
-- React 19
-- Redux Toolkit
-- Capacitor 8
-- Firebase Firestore
-- Vite 6
-- Framer Motion
-
-## Licenza
-
-MIT. Ver `LICENSE`.
 
 ## Autor
 
